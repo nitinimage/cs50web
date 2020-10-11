@@ -1,1 +1,0 @@
-NTPC Dadri consist of gas, thermal and solar

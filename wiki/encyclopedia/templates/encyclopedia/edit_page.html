@@ -9,7 +9,12 @@
     <form action="/wiki/edit/{{title}}" method="post" class="content">
         {% csrf_token %}
         {{ form }}
-        <input type="submit">
+        <input type="submit" value="Done">
+        
+    </form>
+    <form action="/wiki/delete/{{title}}" method="post" class="content">
+        {% csrf_token %}
+        <input class="btn btn-default btn-danger" type="submit" value="Delete Page"/>
     </form>
 
 {% endblock %}

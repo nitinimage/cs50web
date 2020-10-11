@@ -1,0 +1,10 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    {{ title }} Page deleted
+{% endblock %}
+
+{% block body %}
+    <h1>{{ title }} Page has been deleted</h1>
+    <a href="{% url 'index' %}">Go the HomePage</a>
+{% endblock %}

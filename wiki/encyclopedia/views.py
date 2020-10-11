@@ -29,7 +29,6 @@ def edit_page(request, title):
         return render(request, "encyclopedia/edit_page.html", {
             "form" : form ,
             "title" : title
-
         })
     else:
         form = entryform(request.POST)
@@ -46,6 +45,11 @@ def edit_page(request, title):
                 "form" : form
             })
 
+def delete_page(request, title):
+        util.delete_entry(title)
+        return render(request,"encyclopedia/delete_page.html",{
+            "title" : title
+        })
 
 
 def create(request):
