@@ -44,3 +44,14 @@ def search_entries(query):
     return list(sorted(re.sub(r"\.md$", "", filename)
                 for filename in filenames if re.search(query, filename, re.IGNORECASE)))
                 
+
+def delete_entry(title):
+    """
+    Deletes an entry
+    """
+    filename = f"entries/{title}.md"
+    if default_storage.exists(filename):
+        default_storage.delete(filename)
+
+
+

@@ -15,28 +15,34 @@ def index(request):
     })
 
 def page(request, title):
-    return render(request, "encyclopedia/title.html", {
+    return render(request, "encyclopedia/page.html", {
         "entry_data": util.get_entry(title),
         "title": title
     })
 
-def edit_page(request,title):
+
+def edit_page(request, title):
     if request.method == "GET":
-        form = entryform(request.GET)
-        form.title = title
-        form.content =  util.get_entry(title)
+        form = entryform(initial={
+            'title':title,
+            'content':util.get_entry(title)})  
         return render(request, "encyclopedia/edit_page.html", {
-            "form" : form
+            "form" : form ,
+            "title" : title
+
         })
     else:
         form = entryform(request.POST)
         if form.is_valid():
-            title = form.cleaned_data["title"]
-            content = form.cleaned_data["content"]
-            util.save_entry(title,content)
-            return redirect(page,title = title)
+            updated_title = form.cleaned_data["title"]
+            updated_content = form.cleaned_data["content"]
+            if updated_title.lower() in [entry.lower() for entry in util.list_entries()] and updated_title.lower() != title.lower():
+                return redirect(create_error)
+            util.delete_entry(title)
+            util.save_entry(updated_title,updated_content) 
+            return redirect(page,title = updated_title)
         else:
-            return render(request, "encyclopedia/create.html",{
+            return render(request, "encyclopedia/edit_page.html",{
                 "form" : form
             })
 
@@ -73,7 +79,7 @@ def search(request):
 
 def random_page(request):
     random_page = random.choice(util.list_entries())
-    return render(request, "encyclopedia/title.html", {
+    return render(request, "encyclopedia/page.html", {
         "entry_data": util.get_entry(random_page),
         "title": random_page
     })
