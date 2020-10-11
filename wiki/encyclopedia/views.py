@@ -6,8 +6,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 import random
 
 class entryform(forms.Form):
-    title = forms.CharField(label="Title", max_length=100)
-    content = forms.CharField(label= "Content", widget=forms.Textarea)
+    title = forms.CharField(label="Title", max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Title'}) )
+    content = forms.CharField(label= "Content", widget=forms.Textarea(attrs={'placeholder': 'Write here! Be Nice'}))
 
 def index(request):
     return render(request, "encyclopedia/index.html", {

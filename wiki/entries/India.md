@@ -1,0 +1,2 @@
+- **India has several mountain peaks.**
+- *India has many rivers as well.*
