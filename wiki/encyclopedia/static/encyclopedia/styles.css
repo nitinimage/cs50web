@@ -1,6 +1,6 @@
 body {
-    margin: 0;
-    background-color: white;
+    margin-right: 10px;
+    margin-left: 10px;
 }
 
 code {
@@ -35,4 +35,8 @@ textarea {
 
 .sidebar h2 {
     margin-top: 5px;
+}
+
+textarea{
+    height: 50vh;
 }
