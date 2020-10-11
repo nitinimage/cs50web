@@ -1,12 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django import forms
 from . import util
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+import random
 
-class newentry(forms.Form):
-    new_title = forms.CharField(label="New_title")
-    new_content = forms.Textarea()
+class entryform(forms.Form):
+    title = forms.CharField(label="Title", max_length=100)
+    content = forms.CharField(label= "Content", widget=forms.Textarea)
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -19,19 +20,61 @@ def page(request, title):
         "title": title
     })
 
+def edit_page(request,title):
+    if request.method == "GET":
+        form = entryform(request.GET)
+        form.title = title
+        form.content =  util.get_entry(title)
+        return render(request, "encyclopedia/edit_page.html", {
+            "form" : form
+        })
+    else:
+        form = entryform(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+            util.save_entry(title,content)
+            return redirect(page,title = title)
+        else:
+            return render(request, "encyclopedia/create.html",{
+                "form" : form
+            })
+
+
+
 def create(request):
     if request.method == "POST":
-        form = newentry(request.POST)
+        form = entryform(request.POST)
         if form.is_valid():
-            new_title = form.cleaned_data["new_title"]
-            new_content = form.cleaned_data["new_content"]
-            util.save_entry(new_title,new_content)
-            return HttpResponseRedirect(reverse('create'))
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+            if title.lower() in [entry.lower() for entry in util.list_entries()]:
+                return redirect(create_error)
+            util.save_entry(title,content)
+            return redirect(page,title = title)
         else:
             return render(request, "encyclopedia/create.html",{
                 "form" : form
             })
     else:
         return render(request, "encyclopedia/create.html",{
-            "form" : newentry()
+            "form" : entryform()
         })
+
+def create_error(request):
+    return render(request, "encyclopedia/create_error.html")
+
+def search(request):
+        query = request.GET.get('q')
+        search_results = util.search_entries(query)
+        return render(request, "encyclopedia/search.html",{
+            "search_results": search_results
+        })
+
+def random_page(request):
+    random_page = random.choice(util.list_entries())
+    return render(request, "encyclopedia/title.html", {
+        "entry_data": util.get_entry(random_page),
+        "title": random_page
+    })
+    # return redirect(page,title = random_page)

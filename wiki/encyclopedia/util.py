@@ -1,5 +1,5 @@
 import re
-
+import random
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
@@ -35,3 +35,12 @@ def get_entry(title):
         return f.read().decode("utf-8")
     except FileNotFoundError:
         return None
+
+def search_entries(query):
+    """
+    Returns a list of encyclopedia entries with query in entry name.
+    """
+    _, filenames = default_storage.listdir("entries")
+    return list(sorted(re.sub(r"\.md$", "", filename)
+                for filename in filenames if re.search(query, filename, re.IGNORECASE)))
+                

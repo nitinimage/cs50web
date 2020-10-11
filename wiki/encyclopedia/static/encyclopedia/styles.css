@@ -37,6 +37,24 @@ textarea {
     margin-top: 5px;
 }
 
-textarea{
-    height: 50vh;
+.content{
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: 20px;
+    
+}
+
+.content textarea{
+   width: 300px;
+   min-width: 70vw;
+   height: 40vh;
+}
+
+.content label{
+   margin-top: 20px;
+}
+
+.content input[type=submit] {
+   margin-top: 20px;
 }

@@ -1,0 +1,1 @@
+NTPC Dadri consist of gas and thermal

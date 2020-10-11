@@ -8,11 +8,15 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" href="{% static 'encyclopedia/styles.css' %}" >
     </head>
+    <style>
+
+   
+    </style>
     <body>
         <div class="row">
             <div class="sidebar col-lg-2 col-md-3">
                 <h2>Wiki</h2>
-                <form>
+                <form action="{% url 'search' %}">
                     <input class="search" type="text" name="q" placeholder="Search Encyclopedia">
                 </form>
                 <div>
@@ -22,7 +26,7 @@
                     <a href="{% url 'create' %} ">Create New Page</a> 
                 </div>
                 <div>
-                    <a href="">Random Page</a> 
+                    <a href="{% url 'random' %}">Random Page</a> 
                 </div>
                 {% block nav %}
                 {% endblock %}
