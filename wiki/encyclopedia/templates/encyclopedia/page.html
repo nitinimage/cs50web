@@ -11,7 +11,7 @@
         {% if entry_data == None %}
             Page not found
         {% else %}
-            {{entry_data}}
+            {{entry_data|safe }}
         {% endif %}
     </p>
 
