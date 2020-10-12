@@ -6,8 +6,11 @@ from django.http import HttpResponseRedirect, HttpResponse
 import random
 
 class entryform(forms.Form):
-    title = forms.CharField(label="Title", max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Title'}) )
-    content = forms.CharField(label= "Content", widget=forms.Textarea(attrs={'placeholder': 'Write here! Be Nice'}))
+    title = forms.CharField(label="Title", 
+                            max_length=100, 
+                            widget=forms.TextInput(attrs={'placeholder': 'Title'}) )
+    content = forms.CharField(label= "Content", 
+                              widget=forms.Textarea(attrs={'placeholder': 'Write here! Be Nice'}))
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -15,8 +18,17 @@ def index(request):
     })
 
 def page(request, title):
+    try:
+        #get a list of of all titles in lower case
+        entries = [entry.lower() for entry in util.list_entries()]
+        index = entries.index(title.lower())
+        if title != util.list_entries()[index]: 
+            new_title = util.list_entries()[index]
+            return redirect(page, title = new_title) #redirect to proper case string
+    except:
+        title = title
     return render(request, "encyclopedia/page.html", {
-        "entry_data": util.md_to_html(util.get_entry(title)),
+        "entry_data": util.get_entry(title) ,
         "title": title
     })
 
@@ -35,7 +47,8 @@ def edit_page(request, title):
         if form.is_valid():
             updated_title = form.cleaned_data["title"]
             updated_content = form.cleaned_data["content"]
-            if updated_title.lower() in [entry.lower() for entry in util.list_entries()] and updated_title.lower() != title.lower():
+            if updated_title.lower() in [entry.lower() 
+                for entry in util.list_entries()] and updated_title.lower() != title.lower():
                 return redirect(create_error)
             util.delete_entry(title)
             util.save_entry(updated_title,updated_content) 
@@ -77,6 +90,8 @@ def create_error(request):
 def search(request):
         query = request.GET.get('q')
         search_results = util.search_entries(query)
+        if len(search_results) == 1:
+            return redirect(page, title = search_results[0])
         return render(request, "encyclopedia/search.html",{
             "search_results": search_results
         })
