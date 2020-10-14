@@ -28,28 +28,34 @@ def page(request, title):
     except:
         title = title
     return render(request, "encyclopedia/page.html", {
-        "entry_data": util.get_entry(title) ,
+        "entry_data": util.md_to_html(util.get_entry(title)) ,
         "title": title
     })
 
 
 def edit_page(request, title):
     if request.method == "GET":
-        form = entryform(initial={
-            'title':title,
-            'content':util.get_entry(title)})  
-        return render(request, "encyclopedia/edit_page.html", {
-            "form" : form ,
-            "title" : title
-        })
+        #check if title exists
+        entries = [entry.lower() for entry in util.list_entries()]
+        if title.lower() in entries:
+            form = entryform(initial={
+                'title':title,
+                'content':util.get_entry(title)})  
+            return render(request, "encyclopedia/edit_page.html", {
+                "form" : form ,
+                "title" : title
+            })
+        else:
+            return redirect(error, error='title not found')
+    # POST method
     else:
         form = entryform(request.POST)
         if form.is_valid():
             updated_title = form.cleaned_data["title"]
             updated_content = form.cleaned_data["content"]
             if updated_title.lower() in [entry.lower() 
-                for entry in util.list_entries()] and updated_title.lower() != title.lower():
-                return redirect(create_error)
+                                        for entry in util.list_entries()] and updated_title.lower() != title.lower():
+                return redirect(error, error = 'title exists')
             util.delete_entry(title)
             util.save_entry(updated_title,updated_content) 
             return redirect(page,title = updated_title)
@@ -59,10 +65,10 @@ def edit_page(request, title):
             })
 
 def delete_page(request, title):
-        util.delete_entry(title)
-        return render(request,"encyclopedia/delete_page.html",{
-            "title" : title
-        })
+    util.delete_entry(title)
+    return render(request,"encyclopedia/delete_page.html",{
+        "title" : title
+    })
 
 
 def create(request):
@@ -72,7 +78,7 @@ def create(request):
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
             if title.lower() in [entry.lower() for entry in util.list_entries()]:
-                return redirect(create_error)
+                return redirect(error, error = 'title exists')
             util.save_entry(title,content)
             return redirect(page,title = title)
         else:
@@ -84,22 +90,29 @@ def create(request):
             "form" : entryform()
         })
 
-def create_error(request):
-    return render(request, "encyclopedia/create_error.html")
+def error(request, error):
+    error_message = 'Error'
+    if error == 'title exists':
+        error_message = "Title already exists! Please try another title"
+    if error == 'title not found':
+        error_message = 'Title does not exist!'
+    return render(request, "encyclopedia/error.html",{
+        "error_message" : error_message
+    })
 
 def search(request):
-        query = request.GET.get('q')
-        search_results = util.search_entries(query)
-        if len(search_results) == 1:
-            return redirect(page, title = search_results[0])
-        return render(request, "encyclopedia/search.html",{
-            "search_results": search_results
-        })
+    query = request.GET.get('q')
+    search_results = util.search_entries(query)
+    if len(search_results) == 1:
+        return redirect(page, title = search_results[0])
+    return render(request, "encyclopedia/search.html",{
+        "search_results": search_results
+    })
 
 def random_page(request):
     random_page = random.choice(util.list_entries())
     return render(request, "encyclopedia/page.html", {
-        "entry_data": util.get_entry(random_page),
+        "entry_data": util.md_to_html(util.get_entry(random_page)),
         "title": random_page
     })
     # return redirect(page,title = random_page)

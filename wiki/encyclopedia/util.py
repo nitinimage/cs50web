@@ -33,7 +33,7 @@ def get_entry(title):
     """
     try:
         f = default_storage.open(f"entries/{title}.md")
-        return md_to_html(f.read().decode("utf-8"))
+        return f.read().decode("utf-8")
     except FileNotFoundError:
         return None
 
@@ -59,5 +59,5 @@ def md_to_html(content):
     md = Markdown()
     return md.convert(content)
 
-entries = [entry.lower() for entry in list_entries()]
-print(entries)
+
+
