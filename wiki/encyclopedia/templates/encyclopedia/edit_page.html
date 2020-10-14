@@ -6,6 +6,12 @@
 
 {% block body %}
     <h1>Edit {{title}}</h1>
+    {% if error %}
+        <div class="alert alert-danger" role="alert"> 
+            Title already exists! Please try another title.
+         </div>
+    {% endif %}
+    
     <form action="/wiki/edit/{{title}}" method="post" class="content">
         {% csrf_token %}
         {{ form }}

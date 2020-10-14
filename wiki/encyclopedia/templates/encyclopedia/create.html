@@ -6,7 +6,11 @@
 
 {% block body %}
     <h1>Create New Page</h1>
-   
+    {% if error %}
+        <div class="alert alert-danger" role="alert"> 
+            Title already exists! Please try another title.
+         </div>
+    {% endif %}
 
     <form action="{% url 'create' %}" method="post" class="content">
         {% csrf_token %}

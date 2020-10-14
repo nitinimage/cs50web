@@ -43,9 +43,11 @@ def edit_page(request, title):
                 'content':util.get_entry(title)})  
             return render(request, "encyclopedia/edit_page.html", {
                 "form" : form ,
-                "title" : title
+                "title" : title,
+                'error': 0
             })
         else:
+            # to capture edit error from url pattern 
             return redirect(error, error='title not found')
     # POST method
     else:
@@ -55,7 +57,12 @@ def edit_page(request, title):
             updated_content = form.cleaned_data["content"]
             if updated_title.lower() in [entry.lower() 
                                         for entry in util.list_entries()] and updated_title.lower() != title.lower():
-                return redirect(error, error = 'title exists')
+                # return redirect(error, error = 'title exists')
+                return render(request, "encyclopedia/edit_page.html",{
+                "form" : form,
+                'title' : title,
+                'error' : 1
+                })
             util.delete_entry(title)
             util.save_entry(updated_title,updated_content) 
             return redirect(page,title = updated_title)
@@ -78,22 +85,28 @@ def create(request):
             title = form.cleaned_data["title"]
             content = form.cleaned_data["content"]
             if title.lower() in [entry.lower() for entry in util.list_entries()]:
-                return redirect(error, error = 'title exists')
+                # return redirect(error, error = 'title exists')
+                return render(request, "encyclopedia/create.html",{
+                "form" : form,
+                'error': 1
+            })
             util.save_entry(title,content)
             return redirect(page,title = title)
         else:
             return render(request, "encyclopedia/create.html",{
-                "form" : form
+                "form" : form,
+                'error' : 0
             })
     else:
         return render(request, "encyclopedia/create.html",{
-            "form" : entryform()
+            "form" : entryform(),
+            'error' : 0
         })
 
 def error(request, error):
     error_message = 'Error'
-    if error == 'title exists':
-        error_message = "Title already exists! Please try another title"
+    # if error == 'title exists':
+    #     error_message = "Title already exists! Please try another title"
     if error == 'title not found':
         error_message = 'Title does not exist!'
     return render(request, "encyclopedia/error.html",{
