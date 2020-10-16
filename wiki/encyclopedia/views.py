@@ -116,7 +116,7 @@ def error(request, error):
 def search(request):
     query = request.GET.get('q')
     search_results = util.search_entries(query)
-    if len(search_results) == 1:
+    if query.lower() in [entry.lower() for entry in search_results]:
         return redirect(page, title = search_results[0])
     return render(request, "encyclopedia/search.html",{
         "search_results": search_results
