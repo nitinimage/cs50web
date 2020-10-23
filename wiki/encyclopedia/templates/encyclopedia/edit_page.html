@@ -12,13 +12,13 @@
          </div>
     {% endif %}
     
-    <form action="/wiki/edit/{{title}}" method="post" class="content">
+    <form action="{% url 'edit_page' title %}" method="post" class="content">
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="Save">
         
     </form>
-    <form action="/wiki/delete/{{title}}" method="post" class="content">
+    <form action="{% url 'delete_page' title %}" method="post" class="content">
         {% csrf_token %}
         <input class="btn btn-default btn-danger" type="submit" value="Delete Page"/>
     </form>

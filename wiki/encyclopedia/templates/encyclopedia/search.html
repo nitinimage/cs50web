@@ -8,7 +8,11 @@
     <h1>Search Results</h1>
     <ul>
         {% for result in search_results %}
-            <li> <a href="wiki/{{result}}">{{ result }}</a> </li>
+            <li> <a href="{% url 'page' result %}">{{ result }}</a> </li>
+
+        {% empty %}
+            <p>No Match found</p>
+
         {% endfor %}
     </ul>
     
