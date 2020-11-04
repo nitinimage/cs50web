@@ -57,7 +57,7 @@
                         <br>
 
                         <!-- watchlist -->
-                        <form action="{% url 'watchlist' listing.title%}" method="post">
+                        <form action="{% url 'edit_watchlist' listing.title%}" method="post">
                             {% csrf_token %}
                             <div class="form-group">
                                 {% if watchlist_status %}

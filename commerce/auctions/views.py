@@ -79,7 +79,7 @@ def listing(request, listing_title):
             bid_entry.save()
         elif 'comment' in request.POST:
             content = request.POST["comment"]
-            comment = Comment.objects.create(content=content, listing=listing, author=user)
+            comment = Comment.objects.create(content=content, listing=listing, author=request.user)
             comment.save()      
         return HttpResponseRedirect(reverse("listing",args=(listing_title,)))
 
@@ -135,17 +135,16 @@ def useraccount(request):
         })
 
     else:
-        watchlist, created = Watchlist.objects.get_or_create(user = request.user)
         listings = request.user.listings.all()
         form = Userform(instance=request.user)
         return render(request, "auctions/account.html",{
             "form":form,
             "listings":listings,
-            "watchlist": watchlist.listings.all()
+            
         })
 
 
-def watchlist(request,listing_title):
+def edit_watchlist(request,listing_title):
     #add or remove listing from watchlist
     if request.method == "POST":
         listing = Listing.objects.get(title = listing_title)
@@ -155,6 +154,12 @@ def watchlist(request,listing_title):
         else:
             watchlist.listings.add(listing)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def watchlist(request):
+    watchlist, created = Watchlist.objects.get_or_create(user = request.user)
+    return render(request, "auctions/watchlist.html",{
+        "watchlist": watchlist.listings.all()
+    })
 
 
 
