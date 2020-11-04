@@ -1,0 +1,77 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class="container-fluid">
+        <form action="{% url 'useraccount' %}" method="POST">
+            {% csrf_token %}
+            <table class="table" >
+                <thead>
+                    <tr><h2 class="text-center">Edit User Profile</h2>
+                    </tr>
+                </thead>
+                <tbody>
+            
+                    {{ form.as_table }}
+                
+                </tbody>
+            </table>
+            <button class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <br>
+    <hr>
+
+    <div class="container-fluid">
+        <h2 class="text-center">My Listings</h2>
+        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
+            {% for listing in listings %}
+                
+                    <a class="col m-4" href="{% url 'listing' listing.title %}"> 
+                        <div> 
+                            <img class="listing_image" src="{{ listing.image_url }}" alt=""> 
+                        </div>
+                        <div class="text" >
+                            <ul class="price"> Price: ${{ listing.price }}</ul>
+                            <li> {{ listing.title }}</li>
+                            <li> Status: {{ listing.status }}</li>
+                            <li style="color:grey">Created at: {{listing.created_at}}</li>
+                        </div>  
+                    </a>
+            {% empty %}
+                    <p class="text-center">No Listings posted</p>   
+            {% endfor %}
+        </div>
+    </div>
+    <br>
+    <hr>
+
+    <div class="container-fluid">
+        <h2 class="text-center">Watchlist</h2>
+
+        <div class="container-fluid">
+            <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
+                {% for listing in watchlist %}
+                    
+                        <a class="col m-4" href="{% url 'listing' listing.title %}"> 
+                            <div> 
+                                <img class="listing_image" src="{{ listing.image_url }}" alt=""> 
+                            </div>
+                            <div class="text" >
+                                <ul class="price"> Price: ${{ listing.price }}</ul>
+                                <li> {{ listing.title }}</li>
+                                <li> Status: {{ listing.status }}</li>
+                            </div>  
+                        </a>
+                {% empty %}
+                        <p class="text-center">No Listings posted</p>   
+                {% endfor %}
+            </div>
+        </div>
+
+    
+    </div>
+
+    
+    
+{% endblock %}

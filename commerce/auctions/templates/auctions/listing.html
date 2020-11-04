@@ -1,0 +1,111 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="container border p-3">
+        <h2 class="text-center">{{listing.title}}</h2>
+        <div class="row" >
+            <img class="col-4" src="{{ listing.image_url }}" alt="">
+
+
+
+            <div class="col-3 my-auto">
+                <ul>Categories: 
+                    {% for cat in categories %}
+                        <li>{{cat.category}}</li>
+                    {% empty %}
+                        <li>No Category assigned</li> 
+                    {% endfor %}
+                </ul>
+                <ul>
+                    <p>Product Description:</p> 
+                    <p>{{ listing.description }}</p> 
+                </ul> 
+            </div>   
+
+
+            <div class="col-5 my-auto">
+                {% if listing.is_active %}
+                    <li>Status: Active</li>
+                {% else %}
+                    <li>Status: Sold</li>
+                {% endif %}
+                
+                <li>Seller: {{ listing.seller }}</li>
+                <br>
+                <h3>Price: ${{ listing.price }}</h3>
+            
+                {% if not bid.bid_value %}
+                    <p>No bids Placed Yet</p>
+                {% else %}
+                    <h4>Current Bid: ${{ bid.bid_value }} by {{ bid.bidder }}</h4>
+                {% endif  %} 
+                <br>
+
+                <div> 
+                    {% if user == listing.seller%}
+                        <a href="">Edit Listing</a>
+                    {% elif user.is_authenticated and listing.is_active %}
+                        <!-- place bid -->
+                        <form action="{% url 'listing' listing.title%}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input autofocus class="form-control" 
+                                type="number" step="0.01" min={{bid.bid_value|add:1}} max={{listing.price}} Required name="new_bid" placeholder="Enter Bid">
+                            </div>
+                            <button class="btn btn-primary">Place Bid</button>
+                        </form>
+                        <br>
+
+                        <!-- watchlist -->
+                        <form action="{% url 'listing' listing.title%}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                {% if watchlist_status %}
+                                <button class="btn btn-outline-success" name="watchlist">Remove from Watchlist</button>
+                                {% else %}
+                                <button class="btn btn-outline-success" name="watchlist">Add to Watchlist</button>
+                                {% endif %}
+                            </div>
+                        </form>
+                        
+                    {% elif listing.is_active %}
+                        Sign in to place Bids.
+                    {% endif  %}
+
+                    {% if not listing.is_active %}
+                        <h1>Sold!</h1>
+                    {% endif %}
+
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments -->
+        {% if user.is_authenticated %}
+        <form action="{% url 'listing' listing.title%}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="comment">Write Comment:</label>
+                <textarea class="form-control" name="comment" id="comment" cols="30" rows="3" placeholder="Write Comment"></textarea>
+            </div>
+            <button class="btn btn-primary">Submit</button>
+        </form>
+        {% endif %}
+    </div>
+    <br>
+
+
+    <div class="container border p-3">
+        <h4>Comments</h4>
+        {% for comment in comments %}
+
+            <div class="alert alert-info row row-cols-2 border">
+                <div class="col-1">{{comment.author}}:</div>
+                 <div class="col-11" >{{comment.content}}</div> 
+            </div>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}

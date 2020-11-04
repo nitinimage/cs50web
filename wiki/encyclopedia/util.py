@@ -56,6 +56,8 @@ def delete_entry(title):
 
 
 def md_to_html(content):
+    if content == None:
+        return None
     md = Markdown()
     return md.convert(content)
 
