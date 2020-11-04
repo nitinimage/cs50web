@@ -4,7 +4,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.forms import ModelForm
-from django.core import serializers
 
 from .models import User, Listing, Bid, Comment, Watchlist
 
@@ -69,44 +68,19 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-# def watchlist(user,listing):
-#     # add or remove listing from user's watchlist
-#     watchlist, created = Watchlist.objects.get_or_create(user = user)
-#     if listing in watchlist.listings.all():
-#         watchlist.listings.remove(listing)
-#         return "Removed"
-#     else:
-#         watchlist.listings.add(listing)
-#         return "Added"
-    
-
-
 
 def listing(request, listing_title):
     listing = Listing.objects.get(title = listing_title)
-    watchlist_status = False
-    if request.user.is_authenticated:
-        user = User.objects.get(username=request.user.username)
-        watchlist, created = Watchlist.objects.get_or_create(user = user)
-        if listing in watchlist.listings.all():
-            watchlist_status = True
-
-    if request.method == "POST":
-        
+    
+    if request.method == "POST":      
         if 'new_bid' in request.POST:
             new_bid = request.POST["new_bid"]  
-            bid_entry = Bid.objects.create(bid_value = new_bid, bidder=user, listing=listing)
+            bid_entry = Bid.objects.create(bid_value = new_bid, bidder=request.user, listing=listing)
             bid_entry.save()
         elif 'comment' in request.POST:
             content = request.POST["comment"]
             comment = Comment.objects.create(content=content, listing=listing, author=user)
-            comment.save()
-        elif 'watchlist' in request.POST:          
-            if listing in watchlist.listings.all():
-                watchlist.listings.remove(listing)
-            else:
-                watchlist.listings.add(listing)
-            
+            comment.save()      
         return HttpResponseRedirect(reverse("listing",args=(listing_title,)))
 
     # get request    
@@ -114,6 +88,12 @@ def listing(request, listing_title):
         categories = listing.category.all()
         bid = Bid.objects.filter(listing__title = listing_title).last()  
         comments = Comment.objects.filter(listing__title = listing_title)
+        
+        watchlist_status = False
+        if request.user.is_authenticated:
+            watchlist, created = Watchlist.objects.get_or_create(user = request.user)
+            if listing in watchlist.listings.all():
+                watchlist_status = True
 
         return render(request, "auctions/listing.html",{
             "listing" : listing,
@@ -126,6 +106,7 @@ def listing(request, listing_title):
 def newlisting(request):
     if request.method == "POST":
         form = Listingform(request.POST)
+
         if form.is_valid():
             newlisting = form.save(commit=False)
             newlisting.seller = request.user
@@ -143,14 +124,6 @@ def newlisting(request):
     })
 
 def useraccount(request):
-    # user_fields = ['username','first_name','last_name',
-    #                 'email','location','birth_date']
-    # user_data = {}
-    # for field in user_fields:
-    #     user_data[field] = getattr(request.user, field)
-    # return render(request, "auctions/account.html",{
-    #     "user_data": user_data
-    # })
     if request.method == "POST":
         form = Userform(request.POST, instance=request.user)
         if form.is_valid():
@@ -172,7 +145,16 @@ def useraccount(request):
         })
 
 
-
+def watchlist(request,listing_title):
+    #add or remove listing from watchlist
+    if request.method == "POST":
+        listing = Listing.objects.get(title = listing_title)
+        watchlist, created = Watchlist.objects.get_or_create(user = request.user)
+        if listing in watchlist.listings.all():
+            watchlist.listings.remove(listing)
+        else:
+            watchlist.listings.add(listing)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 

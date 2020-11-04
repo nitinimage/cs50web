@@ -57,11 +57,11 @@
                         <br>
 
                         <!-- watchlist -->
-                        <form action="{% url 'listing' listing.title%}" method="post">
+                        <form action="{% url 'watchlist' listing.title%}" method="post">
                             {% csrf_token %}
                             <div class="form-group">
                                 {% if watchlist_status %}
-                                <button class="btn btn-outline-success" name="watchlist">Remove from Watchlist</button>
+                                <button class="btn btn-outline-danger" name="watchlist">Remove from Watchlist</button>
                                 {% else %}
                                 <button class="btn btn-outline-success" name="watchlist">Add to Watchlist</button>
                                 {% endif %}

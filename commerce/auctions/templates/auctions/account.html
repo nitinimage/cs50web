@@ -1,6 +1,64 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+        
+
+    <div class="row">
+        <div class="container col border">
+            
+            <h2 class="text-center">My Listings</h2>
+            <hr>
+            <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 justify-content-center">
+                {% for listing in listings %}
+                    
+                        <a class="col m-4" href="{% url 'listing' listing.title %}"> 
+                            <div> 
+                                 
+                            </div>
+                            <div class="text" >
+                                <img class="listing_image" src="{{ listing.image_url }}" alt="">
+                                <ul class="price"> Price: ${{ listing.price }}</ul>
+                                <li> {{ listing.title }}</li>
+                                <li> Status: {{ listing.status }}</li>
+                                <li style="color:grey">Created at: {{listing.created_at}}</li>
+                            </div>  
+                        </a>
+                {% empty %}
+                        <p class="text-center">No Listings posted</p>   
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="container col border">
+            <h2 class="text-center">Watchlist</h2>
+            <hr>
+            <div class="container-fluid">
+                <div class="row row-cols-lg-2 row-cols-md-1 row-cols-sm-1 justify-content-center">
+                    {% for listing in watchlist %}
+                        
+                            <a class="col m-4" href="{% url 'listing' listing.title %}"> 
+                                <div> 
+                                    <img class="listing_image" src="{{ listing.image_url }}" alt=""> 
+                                </div>
+                                <div class="text" >
+                                    <ul class="price"> Price: ${{ listing.price }}</ul>
+                                    <li> {{ listing.title }}</li>
+                                    <li> Status: {{ listing.status }}</li>
+                                </div>  
+                                <form action="{% url 'watchlist' listing.title %}" method="post">
+                                    {% csrf_token %}     
+                                        <button class="btn btn-outline-danger" name="watchlist">Remove from Watchlist</button>
+                                </form>
+                            </a>
+                    {% empty %}
+                            <p class="text-center">No Listings posted</p>   
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    
+    </div>
+    <br><hr>
 
     <div class="container-fluid">
         <form action="{% url 'useraccount' %}" method="POST">
@@ -18,58 +76,6 @@
             </table>
             <button class="btn btn-primary">Submit</button>
         </form>
-    </div>
-    <br>
-    <hr>
-
-    <div class="container-fluid">
-        <h2 class="text-center">My Listings</h2>
-        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
-            {% for listing in listings %}
-                
-                    <a class="col m-4" href="{% url 'listing' listing.title %}"> 
-                        <div> 
-                            <img class="listing_image" src="{{ listing.image_url }}" alt=""> 
-                        </div>
-                        <div class="text" >
-                            <ul class="price"> Price: ${{ listing.price }}</ul>
-                            <li> {{ listing.title }}</li>
-                            <li> Status: {{ listing.status }}</li>
-                            <li style="color:grey">Created at: {{listing.created_at}}</li>
-                        </div>  
-                    </a>
-            {% empty %}
-                    <p class="text-center">No Listings posted</p>   
-            {% endfor %}
-        </div>
-    </div>
-    <br>
-    <hr>
-
-    <div class="container-fluid">
-        <h2 class="text-center">Watchlist</h2>
-
-        <div class="container-fluid">
-            <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
-                {% for listing in watchlist %}
-                    
-                        <a class="col m-4" href="{% url 'listing' listing.title %}"> 
-                            <div> 
-                                <img class="listing_image" src="{{ listing.image_url }}" alt=""> 
-                            </div>
-                            <div class="text" >
-                                <ul class="price"> Price: ${{ listing.price }}</ul>
-                                <li> {{ listing.title }}</li>
-                                <li> Status: {{ listing.status }}</li>
-                            </div>  
-                        </a>
-                {% empty %}
-                        <p class="text-center">No Listings posted</p>   
-                {% endfor %}
-            </div>
-        </div>
-
-    
     </div>
 
     
