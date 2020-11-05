@@ -4,6 +4,9 @@
 
 {% block body %}
 
+    {% block category %}
+    {% endblock %}
+
     <h2 style="text-align:center">Active Listings</h2>
     <div class="container-fluid">
         <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
@@ -22,6 +25,10 @@
                         </div>  
                     </a>
                 {% endif %} 
+
+                {% empty %}
+                    No Listings posted yet
+
             {% endfor %}
         </div>
     </div>
