@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<div class="container">
+    <br><br>
+    <h2 class="text-center">Categories:</h2>
+    <br>
+    <div class="row row-cols-4">
+        {% for category in categories %}
+            <div class="col mx-3 alert alert-info">
+                <a class="alert-link"  href="{% url 'category' category.category %}">{{ category.category }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <br>
+    {% if user.is_authenticated %}
+    <div>
+        <form action="" method="post" >
+            <div>
+                <label for="">Add New </label>
+                {% csrf_token %}
+                {{ form }}  
+                <input class="btn btn-primary" type="submit" value="Submit">
+
+            </div>
+        </form> 
+
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

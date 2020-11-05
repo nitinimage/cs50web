@@ -26,3 +26,7 @@ body {
 .newlisting label{
     margin: 25px;
 }
+
+.category {
+    width: 25%;
+  }

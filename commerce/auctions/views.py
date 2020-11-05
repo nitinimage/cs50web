@@ -3,11 +3,11 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.forms import ModelForm
+from django.forms import ModelForm, modelform_factory
 from django.contrib.auth.decorators import login_required
 
 
-from .models import User, Listing, Bid, Comment, Watchlist
+from .models import User, Listing, Bid, Comment, Watchlist, Category
 
 
 def index(request):
@@ -219,6 +219,32 @@ def close_auction(request):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+def categories(request):
+    if request.method == "POST":
+        form = Categoryform(request.POST)
+        if form.is_valid():
+            newcategory = form.save()
+            newcategory.save()
+            return HttpResponseRedirect(reverse("categories"))
+        else:
+            return render(request, "auctions/categories.html",{
+            "form": form
+            })
+    else: 
+        form = Categoryform()
+        categories = Category.objects.all()
+        return render(request, "auctions/categories.html",{
+            "categories": categories,
+            "form":form
+            })
+
+def category(request, category_name):
+    listings = Listing.objects.filter(category__category = category_name)
+    return render(request, "auctions/category.html",{
+        "listings":listings,
+        "category_name": category_name
+        })
+
 class Listingform(ModelForm):
     class Meta:
         model = Listing
@@ -229,3 +255,8 @@ class Userform(ModelForm):
     class Meta:
         model = User
         fields = ['username','first_name','last_name','email','location','birth_date']
+
+class Categoryform(ModelForm):
+    class Meta:
+        model = Category
+        fields = ['category']
