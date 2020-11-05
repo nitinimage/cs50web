@@ -1,15 +1,11 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-
-
-<div class="container col border">
-    <h2 class="text-center">Watchlist</h2>
-    <hr>
+    <h2 style="text-align:center">Active Listings</h2>
     <div class="container-fluid">
         <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
-            {% for listing in watchlist %}
-                
+            {% for listing in listings %}
+                    
                     <a class="col m-4" href="{% url 'listing' listing.title %}"> 
                         <div> 
                             <img class="listing_image" src="{{ listing.image_url }}" alt=""> 
@@ -17,19 +13,14 @@
                         <div class="text" >
                             <ul class="price"> Price: ${{ listing.price }}</ul>
                             <li> {{ listing.title }}</li>
-                            <li> Status: {{ listing.status }}</li>
+                            <li> {{ listing.status }}</li>
+                            <li> Seller: {{ listing.seller }}</li>
+                            <li> Winner: {{ listing.winner }}</li>
+                            <li style="color:grey">Created at: {{listing.created_at}}</li>
                         </div>  
-                        <form action="{% url 'edit_watchlist'%}" method="post">
-                            {% csrf_token %} 
-                            <input type="hidden" name="listing_title" value="{{ listing.title }}">   
-                            <button class="btn btn-outline-danger" name="watchlist">Remove from Watchlist</button>
-                        </form>
                     </a>
-            {% empty %}
-                    <p class="text-center">No Listings posted</p>   
+                
             {% endfor %}
         </div>
     </div>
-</div>
-
 {% endblock %}

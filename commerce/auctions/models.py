@@ -26,23 +26,33 @@ class Listing(models.Model):
     description = models.TextField(max_length=250)
     image_url = models.URLField(blank=True)
     category = models.ManyToManyField(Category, blank=True, related_name='listings')
-    price = models.FloatField(default=1)
+    starting_bid = models.FloatField(default=1)
     seller = models.ForeignKey(User, related_name='listings', on_delete=models.CASCADE)
+    winner = models.ForeignKey(User, related_name='winnings', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
+
+    @property
+    def is_active(self):
+        if self.winner == None:
+            return True
+        else:
+            return False
+
     @property
     def status(self):
-        if not self.bids.filter(bid_value = self.price):
+        if self.winner == None:
             return 'Active'
         else:
             return 'Sold'
 
     @property
-    def is_active(self):
-        if not self.bids.filter(bid_value = self.price):
-            return True
-        else:
-            return False
+    def price(self):
+        bid = Bid.objects.filter(listing__title = self.title).last()
+        if not bid:
+            return self.starting_bid
+        return max(bid.bid_value,self.starting_bid)
+
 
     def __str__(self):
         return f"{self.title}"

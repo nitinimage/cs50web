@@ -34,6 +34,37 @@
     </div>
     <br><hr>
 
+    <div class="row">
+        <div class="container col border">
+            
+            <h2 class="text-center">My Winnings</h2>
+            <hr>
+            <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 justify-content-center">
+                {% for listing in winnings %}
+                    
+                        <a class="col m-4" href="{% url 'listing' listing.title %}"> 
+                            <div> 
+                                 
+                            </div>
+                            <div class="text" >
+                                <img class="listing_image" src="{{ listing.image_url }}" alt="">
+                                <ul class="price"> Price: ${{ listing.price }}</ul>
+                                <li> {{ listing.title }}</li>
+                                <li> Status: {{ listing.status }}</li>
+                                <li style="color:grey">Created at: {{listing.created_at}}</li>
+                            </div>  
+                        </a>
+                {% empty %}
+                        <p class="text-center">No Listings posted</p>   
+                {% endfor %}
+            </div>
+        </div>
+
+        
+    
+    </div>
+    <br><hr>
+
     <div class="container-fluid">
         <form action="{% url 'useraccount' %}" method="POST">
             {% csrf_token %}

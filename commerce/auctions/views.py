@@ -4,12 +4,19 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.forms import ModelForm
+from django.contrib.auth.decorators import login_required
+
 
 from .models import User, Listing, Bid, Comment, Watchlist
 
 
 def index(request):
     return render(request, "auctions/index.html" , {
+        "listings" : Listing.objects.all()
+    })
+
+def all_listings(request):
+    return render(request, "auctions/all_listings.html" , {
         "listings" : Listing.objects.all()
     })
 
@@ -86,9 +93,14 @@ def listing(request, listing_title):
     # get request    
     else:
         categories = listing.category.all()
-        bid = Bid.objects.filter(listing__title = listing_title).last()  
         comments = Comment.objects.filter(listing__title = listing_title)
-        
+
+        bid = Bid.objects.filter(listing__title = listing_title).last()  
+        if not bid:
+            min_bid = listing.starting_bid
+        else:
+            min_bid = max(bid.bid_value+1,listing.starting_bid)
+
         watchlist_status = False
         if request.user.is_authenticated:
             watchlist, created = Watchlist.objects.get_or_create(user = request.user)
@@ -99,10 +111,12 @@ def listing(request, listing_title):
             "listing" : listing,
             "categories" : categories,
             "bid" : bid,
+            "min_bid" : min_bid,
             "comments" : comments,
             "watchlist_status" : watchlist_status
     })
 
+@login_required
 def newlisting(request):
     if request.method == "POST":
         form = Listingform(request.POST)
@@ -123,6 +137,33 @@ def newlisting(request):
             "form": form
     })
 
+@login_required(login_url='auctions/login')
+def edit_listing(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk = listing_id)
+        if 'save' in request.POST:
+            form = Listingform(request.POST, instance=listing)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(reverse("listing",args=(listing.title,)))
+            else:
+                return render(request, "auctions/edit_listing.html",{
+                    "form":form,
+                    "listing_id":listing_id,
+                    "listing":listing
+                })
+        elif 'edit_listing' in request.POST:
+            form = Listingform(instance = listing)
+            return render(request, "auctions/edit_listing.html",{
+                "form":form,
+                "listing_id":listing_id,
+                "listing":listing
+            })
+    else:
+        # redirect to index for get requests
+        return HttpResponseRedirect(reverse("index"))
+
+@login_required
 def useraccount(request):
     if request.method == "POST":
         form = Userform(request.POST, instance=request.user)
@@ -136,17 +177,19 @@ def useraccount(request):
 
     else:
         listings = request.user.listings.all()
+        winnings = request.user.winnings.all()
         form = Userform(instance=request.user)
         return render(request, "auctions/account.html",{
             "form":form,
             "listings":listings,
-            
+            "winnings":winnings
         })
 
-
-def edit_watchlist(request,listing_title):
+@login_required
+def edit_watchlist(request):
     #add or remove listing from watchlist
     if request.method == "POST":
+        listing_title = request.POST.get("listing_title","")
         listing = Listing.objects.get(title = listing_title)
         watchlist, created = Watchlist.objects.get_or_create(user = request.user)
         if listing in watchlist.listings.all():
@@ -155,12 +198,25 @@ def edit_watchlist(request,listing_title):
             watchlist.listings.add(listing)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@login_required
 def watchlist(request):
     watchlist, created = Watchlist.objects.get_or_create(user = request.user)
     return render(request, "auctions/watchlist.html",{
         "watchlist": watchlist.listings.all()
     })
 
+@login_required
+def close_auction(request):
+    if request.method == 'POST':
+        listing_title = request.POST.get("listing_title","")
+        listing = Listing.objects.get(title = listing_title)
+        bid = Bid.objects.filter(listing__title = listing_title).last() 
+        if bid is not None:
+            listing.winner = bid.bidder
+        else:
+            listing.winner = request.user
+        listing.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 class Listingform(ModelForm):
