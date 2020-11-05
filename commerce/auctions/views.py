@@ -245,10 +245,17 @@ def category(request, category_name):
         "category_name": category_name
         })
 
+def newcategory(request):
+    newcategory = request.POST["newcategory"]
+    category = Category.objects.create(category=newcategory)
+    category.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 class Listingform(ModelForm):
     class Meta:
         model = Listing
-        exclude = ['seller']
+        exclude = ['seller','winner']
         #fields = '__all__'
 
 class Userform(ModelForm):
@@ -259,4 +266,5 @@ class Userform(ModelForm):
 class Categoryform(ModelForm):
     class Meta:
         model = Category
-        fields = ['category']
+        # fields = ['category']
+        fields = '__all__'

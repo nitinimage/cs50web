@@ -6,7 +6,7 @@
     <br><br>
     <h2 class="text-center">Categories:</h2>
     <br>
-    <div class="row row-cols-4">
+    <div class="row row-cols-5 justify-content-center">
         {% for category in categories %}
             <div class="col mx-3 alert alert-info">
                 <a class="alert-link"  href="{% url 'category' category.category %}">{{ category.category }}</a>
@@ -16,15 +16,17 @@
     <br>
     <br>
     {% if user.is_authenticated %}
-    <div>
+    <div class="row row-cols-4 justify-content-center">
         <form action="" method="post" >
             <div>
                 <label for="">Add New </label>
                 {% csrf_token %}
-                {{ form }}  
+                {{ form }}
+            </div>  
+            <br>
                 <input class="btn btn-primary" type="submit" value="Submit">
 
-            </div>
+            
         </form> 
 
     </div>
