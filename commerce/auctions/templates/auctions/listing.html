@@ -51,6 +51,7 @@
                                     {% csrf_token %}
                                     <button type="submit" name="edit_listing" class="btn btn-outline-warning">Edit Listing</button> 
                                 </form>
+                                <br>
                                 <!-- Close Auction -->
                                 <form action="{% url 'close_auction' %}" method="POST">
                                     {% csrf_token %}
